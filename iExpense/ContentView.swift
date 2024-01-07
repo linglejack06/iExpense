@@ -6,16 +6,33 @@
 //
 
 import SwiftUI
+import Observation
 
+@Observable
+class User {
+    var firstName = "bilbo"
+    var lastName = "baggins"
+}
 struct ContentView: View {
+    @State private var showingSheet = false
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+            Button("Show sheet") {
+                showingSheet.toggle()
+            }
+            .sheet(isPresented: $showingSheet) {
+                SecondView()
+            }
         }
-        .padding()
+    }
+}
+
+struct SecondView: View {
+    @Environment(\.dismiss) var dismiss
+    var body: some View {
+        Button("Dismiss") {
+            dismiss()
+        }
     }
 }
 
