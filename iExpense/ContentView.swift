@@ -14,16 +14,29 @@ class User {
     var lastName = "baggins"
 }
 struct ContentView: View {
-    @State private var showingSheet = false
+    @State private var numbers = [Int]()
+    @State private var currentNumber = 1
     var body: some View {
-        VStack {
-            Button("Show sheet") {
-                showingSheet.toggle()
+        NavigationStack {
+            VStack {
+                List {
+                    ForEach(numbers, id: \.self) {
+                        Text("Row \($0)")
+                    }.onDelete(perform: removeRows)
+                }
+                
+                Button("Add number") {
+                    numbers.append(currentNumber)
+                    currentNumber += 1
+                }
             }
-            .sheet(isPresented: $showingSheet) {
-                SecondView()
+            .toolbar {
+                EditButton()
             }
         }
+    }
+    func removeRows(at offsets: IndexSet) {
+        numbers.remove(atOffsets: offsets)
     }
 }
 
