@@ -23,8 +23,11 @@ struct ContentView: View {
                             Text(item.type)
                         }
                         Spacer()
-                        Text(item.amount, format: .currency(code: "USD"))
+                        Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
                     }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .padding(5)
+                    .border((item.amount > 100) ? .red : ((item.amount > 10) ? .yellow : .green), width: 3)
                 }
                 .onDelete(perform: removeItems)
             }
