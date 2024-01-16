@@ -15,21 +15,22 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             List {
-                ForEach(expenses.items) { item in
-                    HStack {
-                        VStack {
-                            Text(item.name)
-                                .font(.headline)
-                            Text(item.type)
-                        }
-                        Spacer()
-                        Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+                Section("Personal Expenses") {
+                    ForEach(expenses.personalItems) { item in
+                        ItemView(item: item)
                     }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .padding(5)
-                    .border((item.amount > 100) ? .red : ((item.amount > 10) ? .yellow : .green), width: 3)
+                    .onDelete { offsets in
+                        removeItems(at: offsets, filter: "Personal")
+                    }
                 }
-                .onDelete(perform: removeItems)
+                Section("Business Expenses") {
+                    ForEach(expenses.businessItems) { item in
+                        ItemView(item: item)
+                    }
+                    .onDelete { offsets in
+                        removeItems(at: offsets, filter: "Business")
+                    }
+                }
             }
             .toolbar {
                 Button("Add Expense", systemImage: "plus") {
@@ -41,8 +42,35 @@ struct ContentView: View {
             AddView(expenses: expenses)
         }
     }
-    func removeItems(at offsets: IndexSet) {
-        expenses.items.remove(atOffsets: offsets)
+    func removeItems(at offsets: IndexSet, filter: String) {
+        let itemsToDelete: [UUID]
+        if(filter == "Personal") {
+            itemsToDelete = offsets.map { expenses.personalItems[$0].id }
+        } else {
+            itemsToDelete = offsets.map { expenses.businessItems[$0].id }
+        }
+        expenses.items.removeAll { item in
+            itemsToDelete.contains(item.id)
+        }
+    }
+}
+
+struct ItemView: View {
+    var item: ExpenseItem
+    
+    var body: some View {
+        HStack {
+            VStack {
+                Text(item.name)
+                    .font(.headline)
+                Text(item.type)
+            }
+            Spacer()
+            Text(item.amount, format: .currency(code: Locale.current.currency?.identifier ?? "USD"))
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .padding(5)
+        .border((item.amount > 100) ? .red : ((item.amount > 10) ? .yellow : .green), width: 3)
     }
 }
 
