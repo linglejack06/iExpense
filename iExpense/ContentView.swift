@@ -10,20 +10,32 @@ import Observation
 
 struct ContentView: View {
     @State private var expenses = Expenses()
+    @State private var showingAddView = false
+    
     var body: some View {
         NavigationStack {
             List {
-                ForEach(expenses.items, id: \.name) { item in
-                    Text(item.name)
+                ForEach(expenses.items) { item in
+                    HStack {
+                        VStack {
+                            Text(item.name)
+                                .font(.headline)
+                            Text(item.type)
+                        }
+                        Spacer()
+                        Text(item.amount, format: .currency(code: "USD"))
+                    }
                 }
                 .onDelete(perform: removeItems)
             }
             .toolbar {
                 Button("Add Expense", systemImage: "plus") {
-                    let expense = ExpenseItem(name: "Test", type: "Personal", amount: 5)
-                    expenses.items.append(expense)
+                    showingAddView = true
                 }
             }
+        }
+        .sheet(isPresented: $showingAddView) {
+            AddView(expenses: expenses)
         }
     }
     func removeItems(at offsets: IndexSet) {
